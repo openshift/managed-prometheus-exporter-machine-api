@@ -1,4 +1,5 @@
 SHELL := /bin/bash
+include project.mk
 include functions.mk
 
 # Name of the exporter
@@ -39,8 +40,7 @@ RESOURCELIST := servicemonitor/$(PREFIXED_NAME) service/$(PREFIXED_NAME) \
 	rolebinding/$(SERVICEACCOUNT_NAME)-read-cluster-setup 
 
 
-all: deploy/010_serviceaccount-rolebinding.yaml deploy/025_sourcecode.yaml deploy/040_deployment.yaml deploy/050_service.yaml deploy/060_servicemonitor.yaml
-
+all: deploy/010_serviceaccount-rolebinding.yaml deploy/025_sourcecode.yaml deploy/040_deployment.yaml deploy/050_service.yaml deploy/060_servicemonitor.yaml generate-syncset
 
 deploy/010_serviceaccount-rolebinding.yaml: resources/010_serviceaccount-rolebinding.yaml.tmpl Makefile
 	@$(call generate_file,010_serviceaccount-rolebinding)
@@ -60,6 +60,9 @@ deploy/050_service.yaml: resources/050_service.yaml.tmpl Makefile
 deploy/060_servicemonitor.yaml: resources/060_servicemonitor.yaml.tmpl Makefile
 	@$(call generate_file,060_servicemonitor)
 
+.PHONY: generate-syncset
+generate-syncset:
+	docker run --rm -v `pwd`:`pwd` python:2.7.15 /bin/sh -c "cd `pwd`; pip install pyyaml; scripts/generate_syncset.py -t ${SELECTOR_SYNC_SET_TEMPLATE_DIR} -y ${YAML_DIRECTORY} -d ${SELECTOR_SYNC_SET_DESTINATION} -r ${REPO_NAME}"
 
 .PHONY: clean
 clean:
