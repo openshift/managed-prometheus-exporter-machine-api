@@ -51,7 +51,7 @@ deploy/025_sourcecode.yaml: $(SOURCEFILES) Makefile
 	done ; \
 	kubectl -n openshift-monitoring create configmap $(SOURCE_CONFIGMAP_NAME) --dry-run=true -o yaml $$files 1> deploy/025_sourcecode.yaml
 
-deploy/040_deployment.yaml: resources/040_deployment.yaml.tmpl Makefile
+deploy/040_deployment.yaml: resources/040_deployment.yaml.tmpl Makefile $(SOURCEFILES)
 	@$(call generate_file,040_deployment)
 
 deploy/050_service.yaml: resources/050_service.yaml.tmpl Makefile
@@ -62,7 +62,7 @@ deploy/060_servicemonitor.yaml: resources/060_servicemonitor.yaml.tmpl Makefile
 
 .PHONY: generate-syncset
 generate-syncset:
-	docker run --rm -v `pwd`:`pwd` python:2.7.15 /bin/sh -c "cd `pwd`; pip install pyyaml; scripts/generate_syncset.py -t ${SELECTOR_SYNC_SET_TEMPLATE_DIR} -y ${YAML_DIRECTORY} -d ${SELECTOR_SYNC_SET_DESTINATION} -r ${REPO_NAME}"
+	docker run --rm -v `pwd -P`:`pwd -P` python:2.7.15 /bin/sh -c "cd `pwd -P`; pip install pyyaml; scripts/generate_syncset.py -t ${SELECTOR_SYNC_SET_TEMPLATE_DIR} -y ${YAML_DIRECTORY} -d ${SELECTOR_SYNC_SET_DESTINATION} -r ${REPO_NAME}"
 
 .PHONY: clean
 clean:
@@ -78,7 +78,7 @@ resourcelist:
 
 .PHONY: vardump
 vardump:
-	@echo $(SOURCE_CONFIGMAP_NAME)
+	@echo $(SOURCE_CODE_HASH)
 
 .PHONY: uninstall
 uninstall:
@@ -87,3 +87,4 @@ uninstall:
 .PHONY: install
 install:
 	oc apply -f deploy
+

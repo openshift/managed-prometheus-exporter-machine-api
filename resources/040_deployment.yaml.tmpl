@@ -14,6 +14,8 @@ spec:
       name: $PREFIXED_NAME
       labels:
         name: $PREFIXED_NAME
+      annotations:
+        managed.openshift.io/exporter_source_code_hash: $SOURCE_CODE_HASH
     spec:
       containers:
       - name: "main"
