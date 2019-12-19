@@ -77,8 +77,14 @@ objects:
                 readOnly: true
               workingDir: /monitor
             dnsPolicy: ClusterFirst
+            nodeSelector:
+              node-role.kubernetes.io/infra: ''
             restartPolicy: Always
             serviceAccountName: sre-machine-api-status-exporter
+            tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
+              operator: Exists
             volumes:
             - configMap:
                 name: sre-machine-api-status-exporter-code
