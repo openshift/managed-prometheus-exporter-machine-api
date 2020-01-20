@@ -44,6 +44,14 @@ objects:
               name: sre-machine-api-status-exporter
             name: sre-machine-api-status-exporter
           spec:
+            affinity:
+              nodeAffinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                - preference:
+                    matchExpressions:
+                    - key: node-role.kubernetes.io/infra
+                      operator: Exists
+                  weight: 1
             containers:
             - command:
               - /bin/sh
@@ -77,8 +85,6 @@ objects:
                 readOnly: true
               workingDir: /monitor
             dnsPolicy: ClusterFirst
-            nodeSelector:
-              node-role.kubernetes.io/infra: ''
             restartPolicy: Always
             serviceAccountName: sre-machine-api-status-exporter
             tolerations:
